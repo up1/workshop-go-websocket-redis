@@ -1,14 +1,5 @@
 version: "3"
 services:
-  ui:
-    build:
-      context: ./ui
-      dockerfile: Dockerfile
-    ports:
-      - 8000:80
-    depends_on:
-      lb:
-        condition: service_healthy
   lb:
     image: haproxy:2.6.6-alpine
     ports:
@@ -24,10 +15,24 @@ services:
     depends_on:
       ws1:
         condition: service_healthy
+      ws2:
+        condition: service_healthy
   ws1:
     build:
       context: ./ws
       dockerfile: Dockerfile
+    image: somkiat/ws
+    healthcheck:
+      test: ["CMD", "wget", "-nv","-t1", "--spider", "http://localhost:8080/healthz"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
+    depends_on:
+      redis:
+        condition: service_healthy
+  ws2:
+    image: somkiat/ws
     healthcheck:
       test: ["CMD", "wget", "-nv","-t1", "--spider", "http://localhost:8080/healthz"]
       interval: 2s

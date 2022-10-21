@@ -15,5 +15,6 @@ $docker compose logs --follow
 
 ## Test WebSocker with [wscat](https://www.npmjs.com/package/wscat)
 ```
-$wscat -c ws://localhost:8080/ws/user01
+$wscat -c ws://localhost:8080/ws/1
+$wscat -c ws://localhost:8080/ws/2
 ```

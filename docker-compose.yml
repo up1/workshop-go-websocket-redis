@@ -1,0 +1,49 @@
+version: "3"
+services:
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    ports:
+      - 8000:80
+    depends_on:
+      lb:
+        condition: service_healthy
+  lb:
+    image: haproxy:2.6.6-alpine
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./lb:/usr/local/etc/haproxy
+    healthcheck:
+      test: ["CMD", "wget", "-nv","-t1", "--spider", "http://localhost:8080/healthz"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
+    depends_on:
+      ws1:
+        condition: service_healthy
+  ws1:
+    build:
+      context: ./ws
+      dockerfile: Dockerfile
+    healthcheck:
+      test: ["CMD", "wget", "-nv","-t1", "--spider", "http://localhost:8080/healthz"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+      start_period: 3s
+    depends_on:
+      redis:
+        condition: service_healthy
+  redis:
+    image: redis:7.0.5
+    ports:
+      - 6379:6379
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+      start_period: 3s

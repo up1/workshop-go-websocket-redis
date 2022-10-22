@@ -15,7 +15,8 @@ export let options = {
 
 export default function () {
   const text = 'Hello from server, Guest!';
-  const url = 'ws://localhost:8080/ws/user01';
+  const id = Math.floor(Math.random() * 100);
+  const url = 'ws://localhost:8080/ws/'+ id;
 
   const res = ws.connect(url, null, function (socket) {
     socket.on('open', function open() {

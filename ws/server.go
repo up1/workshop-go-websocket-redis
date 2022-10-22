@@ -107,7 +107,9 @@ func (h *Hub) subscribeFromRedis() {
 
 func (h *Hub) broadcastToClients(message Message) {
 	for client := range h.Rooms[message.Room] {
-		client.send <- message.Data
+		if client != nil {
+			client.send <- message.Data
+		}
 	}
 }
 
